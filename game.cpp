@@ -55,8 +55,7 @@ void Draw() {
     for (int i = 0; i < ROWS; i++) {
         vector<char> row;
         for (int j = 0; j < COLS; j++)
-        {
-            // Проверка, является ли текущая ячейка частью змейки
+        {            
             bool isSnakeSegment = false;
             for (const auto& segment : snake) {
                 if (segment.x == j && segment.y == i) {
@@ -129,19 +128,16 @@ void Logic() {
     }
 
     for (const auto& segment : snake) {
-        if (newHead.x == segment.x && newHead.y == segment.y or (newHead.x == -1) or (newHead.x == 10) or (newHead.y == 10) or (newHead.y == -1)) {
-            // Столкновение с самой собой
+        if (newHead.x == segment.x && newHead.y == segment.y or (newHead.x == -1) or (newHead.x == 10) or (newHead.y == 10) or (newHead.y == -1)) {         
             gameOver = true;
             break;
         }
     }
 
 
-
     snake.push_front(newHead);
 
-
-    // Проверка столкновения с яблоком
+  
     if (newHead.x == appleX && newHead.y == appleY) {
         score++;
         if (score == ROWS * COLS) {
