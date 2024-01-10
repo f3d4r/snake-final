@@ -15,13 +15,11 @@ enum moving { STOP = 0, LEFT, RIGHT, DOWN, UP };
 moving direction;
 
 bool gameOver;
-bool refresh;
-const int SNAKEHEAD = 0;
 const int ROWS = 10;
 const int COLS = 10;
-const char APPLEDRAW = '@';
-const char SNAKEDRAW = '0';
-const char MAPDRAW = '.';
+const char APPLE_DRAW = '@';
+const char SNAKE_DRAW = '0';
+const char MAP_DRAW = '.';
 
 struct coordinates
 {
@@ -32,9 +30,10 @@ struct coordinates
 int appleX, appleY;
 int score = 2;
 vector<vector<char>> map;
-deque<coordinates> snake; 
+deque<coordinates> snake;
 
 coordinates coord;
+coordinates newHead;
 
 void Initialization() {
     gameOver = false;
@@ -50,33 +49,21 @@ void Initialization() {
 }
 
 void Draw() {
-
     system("cls");
     for (int i = 0; i < ROWS; i++) {
         vector<char> row;
-        for (int j = 0; j < COLS; j++)
-        {            
-            bool isSnakeSegment = false;
-            for (const auto& segment : snake) {
-                if (segment.x == j && segment.y == i) {
-                    row.push_back(SNAKEDRAW);
-                    isSnakeSegment = true;
-                    break;
-                }
-            }
-
-            if (!isSnakeSegment) {
-                if (i == appleY && j == appleX) {
-                    row.push_back(APPLEDRAW);
-                }
-                else {
-                    row.push_back(MAPDRAW);
-                }
-            }
+        for (int j = 0; j < COLS; j++) {
+            row.push_back(MAP_DRAW);
         }
         map.push_back(row);
     }
+      
+    for (const auto& segment : snake) {       
+        map[segment.y][segment.x] = SNAKE_DRAW;
+    }
 
+    map[appleY][appleX] = APPLE_DRAW;
+   
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++)
         {
@@ -106,8 +93,8 @@ void Input() {
     }
 }
 
-void Logic() {
-    coordinates newHead = snake.front();
+void Move_Logic() {
+    newHead = snake.front();
     switch (direction)
     {
     case LEFT:
@@ -126,18 +113,22 @@ void Logic() {
         gameOver = true;
         break;
     }
+}
 
+void Collision_Logic() {
     for (const auto& segment : snake) {
-        if (newHead.x == segment.x && newHead.y == segment.y or (newHead.x == -1) or (newHead.x == 10) or (newHead.y == 10) or (newHead.y == -1)) {         
+        if (newHead.x == segment.x && newHead.y == segment.y or (newHead.x == -1) or (newHead.x == 10) or (newHead.y == 10) or (newHead.y == -1)) {
             gameOver = true;
+            cout << "GAME OVER" << endl;
             break;
         }
     }
 
-
     snake.push_front(newHead);
+}
 
-  
+void Apple_Logic() {
+
     if (newHead.x == appleX && newHead.y == appleY) {
         score++;
         if (score == ROWS * COLS) {
@@ -150,16 +141,18 @@ void Logic() {
     else {
         snake.pop_back();
     }
-} 
+}
 
 int main() {
     Initialization();
-     while (!gameOver) {
+    while (!gameOver) {
         Draw();
         Input();
-        Logic();
+        Move_Logic();
+        Collision_Logic();
+        Apple_Logic();
         map.clear();
-        Sleep(350);         
-    } 
+        Sleep(350);
+    }
     return 0;
 }
